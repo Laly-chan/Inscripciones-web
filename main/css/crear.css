@@ -1,0 +1,34 @@
+.crearform{
+    display: block;
+    padding: 1rem;
+    padding-top: 0;
+    margin-left: 2%;
+    margin-right: 2%;
+    font-size: 18px;
+    background-color: rgb(204, 179, 255);
+}
+
+.creartext{
+    display: inline-block;
+}
+
+.crearinput{
+    display: inline-block;
+    background-color: rgb(229, 202, 255);
+}
+
+.errmessage{
+    display: inline-block;
+    color: rgb(204, 179, 255);
+    background-color: rgb(204, 179, 255);
+}
+
+#creartitle{
+    padding-top: 1rem;
+    font-size: 26px;
+}
+
+.saveButton{
+    font-size: 17px;
+    float: right;
+}

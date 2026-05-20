@@ -1,0 +1,126 @@
+body{
+    margin: 0;
+}
+
+#logo{
+    height: 65px;
+    display: block;
+    float: left;
+}
+
+header{
+    background-color: mediumpurple;
+    margin: 0;
+    font-size: 20px;
+    padding: 10px;
+    padding-left: 1rem;
+    color: white;
+}
+
+h1{
+    margin: 0;
+    padding: 1rem;
+}
+
+nav{
+    padding: 0;
+    background-color: rgb(191, 172, 230);
+    text-align: center;
+    margin-bottom: 2%;
+}
+
+a{
+    text-decoration: none;
+    color: black;
+}
+
+.navlink{
+    font-size: 24px;
+    margin-left: 5%;
+    margin-right: 5%;
+    text-align: center;
+    padding: 1px;
+    padding-left: 2%;
+    padding-right: 2%;
+    cursor: pointer;
+}
+
+.listarticle{
+    display: block;
+    align-self: center;
+    padding: 1rem;
+    margin-left: 2%;
+    margin-right: 2%;
+    font-size: 20px;
+    background-color: rgb(204, 179, 255);
+}
+
+.moreinfo{
+    font-size: 15px;
+    margin: 2px;
+}
+
+.fullinfoarticle{
+    display: block;
+    align-self: center;
+    padding: 1rem;
+    margin-left: 2%;
+    margin-right: 2%;
+    font-size: 27px;
+    background-color: rgb(204, 179, 255);
+    font-family: 'Times New Roman';
+    font: bold;
+}
+
+.morefullinfo{
+    font: normal;
+    font-size: 18px;
+    margin-top: 18px;
+    margin-bottom: 0px;
+}
+
+footer{
+    background-color: mediumpurple;
+    margin: 0;
+    margin-top: 2%;
+    padding: 10px;
+}
+
+.maininfo{
+    display: block;
+    align-self: center;
+    padding: 1rem;
+    margin-left: 2%;
+    margin-right: 2%;
+    margin-bottom: 2%;
+    font-size: 27px;
+    background-color: rgb(204, 179, 255);
+    font-family: 'Times New Roman';
+}
+
+.pageButton{
+    font-size: 15px;
+    font:bold;
+    padding: 8px;
+    border-radius: 50%;
+    background-color: rgb(208, 193, 238);
+    margin-left: 4px;
+    margin-right: 4px;
+    cursor: pointer;
+}
+
+#pagenav{
+    padding: 0.5rem;
+    margin: 2%;
+    margin-bottom: 0;
+}
+
+.masButton{
+    font-size: 15px;
+    float: right;
+}
+
+.crearButton{
+    font-size: 17px;
+    float: right;
+}

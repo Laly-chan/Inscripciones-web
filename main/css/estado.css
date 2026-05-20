@@ -1,0 +1,12 @@
+.navpressed{
+    background-color: #9e7fdc;
+}
+
+.articleclaro{
+    background-color: rgb(220, 202, 255);
+}
+
+.pagepressed{
+    background-color: rgb(157, 133, 206);
+    cursor: default;
+}

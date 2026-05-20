@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link type="text/css" rel="stylesheet" href="css/estilo.css" media="screen, print"/>
+    <link type="text/css" rel="stylesheet" href="css/estado.css" media="screen, print"/>
+    <link type="text/css" rel="stylesheet" href="css/crear.css" media="screen, print"/>
+    <title>FCAD - Inscripciones</title>
+</head>
+<body>
+    <header>
+        <img id="logo" src="image/Logos-FCAD-01.png" alt="FCAD_logo"/>
+        <h1 style="display: inline-block">
+            FCAD
+        </h1>
+        <h1 style="display: inline-block">
+            Inscripciones
+        </h1>
+    </header>
+
+    <nav>
+        <label id="dashboard" title="Dashboard" class="navlink">
+            <a href="./index.html">Inicio</a>
+        </label>
+        <label id="estudiante" title="Estudiantes" class="navlink navpressed">
+            Creación de curso
+        </label>
+    </nav>
+
+    <main id="themain">
+        <h2 id="creartitle" class="crearform" style="margin-bottom: 0;">Nuevo Curso</h2>
+
+        <div id="error" class="alert alert-danger" style="display: none" role="alert"></div>
+
+        <form id="formulario">
+            <div class="crearform">
+                <label for="nombre" class="creartext">Nombre:</label>
+                <input type="text" class="crearinput" id="nombre" required>
+            </div>
+            <div class="crearform">
+                <label for="descripcion" class="creartext">Descripción:</label> <br>
+                <textarea class="crearinput" id="descripcion" rows="3" required></textarea>
+            </div>
+            <div class="crearform">
+                <label for="fechaInicio" class="creartext">Fecha de inicio:</label>
+                <input type="date" class="crearinput" id="inicio" required>
+            </div>
+            <div class="crearform">
+                <label for="cantidadHoras" class="creartext">Cantidad de horas:</label>
+                <input type="number" class="crearinput" id="horas" value="1" required min="1">
+            </div>
+            <div class="crearform">
+                <label for="cantidadInscriptos" class="creartext">Cantidad máxima de cupos:</label>
+                <input type="number" class="crearinput" id="max" value="1" required min="1">
+            </div>
+            <div class="crearform">
+                <!-- <input type="radio" id="borrador" name="fav_language" value="1">
+                <label for="borrador">Borrador</label><br>
+                <input type="radio" id="open" name="fav_language" value="2">
+                <label for="open">Inscripción abierta</label><br>
+                <input type="radio" id="close" name="fav_language" value="3">
+                <label for="close">Inscripción cerrada</label>
+                <label for="estado" class="creartext">Estado:</label> -->
+                <label for="estado" class="creartext">Estado:</label>
+                <input id="estado" list="lestado" class="crearinput" value="Borrador" name="Estados" required>
+                    <datalist id="lestado">
+                        <option value="Borrador">Borrador</option>
+                        <option value="Inscripción abierta">Inscripción abierta</option>
+                        <option value="Inscripción cerrada">Inscripción cerrada</option>
+                    </datalist>
+            </div>
+            <div class="crearform">
+                <p id="buttonform" class="errmessage">.</p>
+                <button id="guardarCurso" type="submit" class="saveButton">Crear curso</button>
+            </div>
+        </form> 
+    </main>
+
+    <footer>
+        :3
+    </footer>
+    <script type="module" src="java/crear.js"></script>
+
+</body>
+</html>

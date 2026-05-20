@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link type="text/css" rel="stylesheet" href="css/estilo.css" media="screen, print"/>
+    <link type="text/css" rel="stylesheet" href="css/estado.css" media="screen, print"/>
+    <link type="text/css" rel="stylesheet" href="css/crear.css" media="screen, print"/>
+    <title>FCAD - Inscripciones</title>
+</head>
+<body>
+    <header>
+        <img id="logo" src="image/Logos-FCAD-01.png" alt="FCAD_logo"/>
+        <h1 style="display: inline-block">
+            FCAD
+        </h1>
+        <h1 style="display: inline-block">
+            Inscripciones
+        </h1>
+    </header>
+
+    <nav>
+        <label id="dashboard" title="Dashboard" class="navlink">
+            <a href="./index.html">Inicio</a>
+        </label>
+        <label id="estudiante" title="Estudiantes" class="navlink navpressed">
+            Editar estudiante
+        </label>
+    </nav>
+
+    <main id="themain">
+        <h2 id="creartitle" class="crearform" style="margin-bottom: 0;">Estudiante</h2>
+
+        <div id="error" class="alert alert-danger" style="display: none" role="alert"></div>
+
+        <form id="formulario">
+            <div class="crearform">
+                <label for="nombre" class="creartext">Nombre:</label>
+                <input type="text" class="crearinput" id="nombre" required>
+            </div>
+            <div class="crearform">
+                <label for="apellido" class="creartext">Apellido:</label>
+                <input type="text" class="crearinput" id="apellido" required>
+            </div>
+            <div class="crearform">
+                <label for="doc" class="creartext">Documento:</label>
+                <input type="text" class="crearinput" id="doc" required>
+            </div>
+            <div class="crearform">
+                <label for="mail" class="creartext">Email:</label>
+                <input type="text" class="crearinput" id="mail" required>
+            </div>
+            <div class="crearform">
+                <label for="nac" class="creartext">Fecha de nacimiento:</label>
+                <input type="date" class="crearinput" id="nac" required>
+            </div>
+
+            <div class="crearform">
+                <p id="buttonform" class="errmessage">.</p>
+                <button id="modificarEstudiante" class="saveButton">Guardar estudiante</button>
+            </div>
+        </form> 
+    </main>
+
+    <footer>
+        :3
+    </footer>
+    <script type="module" src="java/editar.js"></script>
+
+</body>
+</html>
