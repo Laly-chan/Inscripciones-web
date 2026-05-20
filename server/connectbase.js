@@ -5,7 +5,7 @@ const main = async () => {
         host: process.env.PGHOST || 'localhost',
         port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
         user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || 'wwssadadqe',
+        password: process.env.PGPASSWORD || '',
         database: process.env.PGDATABASE || 'postgres',
     });
 
@@ -30,7 +30,7 @@ const getEstudiantePage = async (pag) => {
         host: process.env.PGHOST || 'localhost',
         port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
         user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || 'wwssadadqe',
+        password: process.env.PGPASSWORD || '',
         database: process.env.PGDATABASE || 'postgres',
     });
 
@@ -57,7 +57,7 @@ const getLenghtEstudiante = async () => {
         host: process.env.PGHOST || 'localhost',
         port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
         user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || 'wwssadadqe',
+        password: process.env.PGPASSWORD || '',
         database: process.env.PGDATABASE || 'postgres',
     });
 
@@ -82,7 +82,7 @@ const getEstudiante = async (id) => {
         host: process.env.PGHOST || 'localhost',
         port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
         user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || 'wwssadadqe',
+        password: process.env.PGPASSWORD || '',
         database: process.env.PGDATABASE || 'postgres',
     });
 
@@ -107,7 +107,7 @@ const getCursoPage = async (pag) => {
         host: process.env.PGHOST || 'localhost',
         port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
         user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || 'wwssadadqe',
+        password: process.env.PGPASSWORD || '',
         database: process.env.PGDATABASE || 'postgres',
     });
 
@@ -134,7 +134,7 @@ const getLenghtCurso = async () => {
         host: process.env.PGHOST || 'localhost',
         port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
         user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || 'wwssadadqe',
+        password: process.env.PGPASSWORD || '',
         database: process.env.PGDATABASE || 'postgres',
     });
 
@@ -159,7 +159,7 @@ const getCurso = async (id) => {
         host: process.env.PGHOST || 'localhost',
         port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
         user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || 'wwssadadqe',
+        password: process.env.PGPASSWORD || '',
         database: process.env.PGDATABASE || 'postgres',
     });
 
@@ -184,7 +184,7 @@ const getInscripcionPage = async (pag) => {
         host: process.env.PGHOST || 'localhost',
         port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
         user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || 'wwssadadqe',
+        password: process.env.PGPASSWORD || '',
         database: process.env.PGDATABASE || 'postgres',
     });
 
@@ -211,7 +211,7 @@ const getLenghtInscripcion = async () => {
         host: process.env.PGHOST || 'localhost',
         port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
         user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || 'wwssadadqe',
+        password: process.env.PGPASSWORD || '',
         database: process.env.PGDATABASE || 'postgres',
     });
 
@@ -236,7 +236,7 @@ const getInscripcion = async (id) => {
         host: process.env.PGHOST || 'localhost',
         port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
         user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || 'wwssadadqe',
+        password: process.env.PGPASSWORD || '',
         database: process.env.PGDATABASE || 'postgres',
     });
 
@@ -261,7 +261,7 @@ const getCursosEstados = async () => {
         host: process.env.PGHOST || 'localhost',
         port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
         user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || 'wwssadadqe',
+        password: process.env.PGPASSWORD || '',
         database: process.env.PGDATABASE || 'postgres',
     });
 
@@ -286,7 +286,7 @@ const getInscripcionesEstados = async () => {
         host: process.env.PGHOST || 'localhost',
         port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
         user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || 'wwssadadqe',
+        password: process.env.PGPASSWORD || '',
         database: process.env.PGDATABASE || 'postgres',
     });
 
@@ -311,7 +311,7 @@ const getUsuarios = async () => {
         host: process.env.PGHOST || 'localhost',
         port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
         user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || 'wwssadadqe',
+        password: process.env.PGPASSWORD || '',
         database: process.env.PGDATABASE || 'postgres',
     });
 
@@ -336,7 +336,7 @@ const softDelCurso = async (id,est,usu) => {
         host: process.env.PGHOST || 'localhost',
         port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
         user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || 'wwssadadqe',
+        password: process.env.PGPASSWORD || '',
         database: process.env.PGDATABASE || 'postgres',
     });
     
@@ -368,7 +368,7 @@ const softDelEstudiante = async (id,usu) => {
         host: process.env.PGHOST || 'localhost',
         port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
         user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || 'wwssadadqe',
+        password: process.env.PGPASSWORD || '',
         database: process.env.PGDATABASE || 'postgres',
     });
 
@@ -399,7 +399,7 @@ const modificarCurso = async (cur) => {
         host: process.env.PGHOST || 'localhost',
         port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
         user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || 'wwssadadqe',
+        password: process.env.PGPASSWORD || '',
         database: process.env.PGDATABASE || 'postgres',
     });
     
@@ -437,7 +437,7 @@ const modificarEstudiante = async (est) => {
         host: process.env.PGHOST || 'localhost',
         port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
         user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || 'wwssadadqe',
+        password: process.env.PGPASSWORD || '',
         database: process.env.PGDATABASE || 'postgres',
     });
 
@@ -475,7 +475,7 @@ const softDelInscripcion = async (id,usu) => {
         host: process.env.PGHOST || 'localhost',
         port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
         user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || 'wwssadadqe',
+        password: process.env.PGPASSWORD || '',
         database: process.env.PGDATABASE || 'postgres',
     });
 
@@ -507,7 +507,7 @@ const agregarCurso = async (obj) => {
         host: process.env.PGHOST || 'localhost',
         port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
         user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || 'wwssadadqe',
+        password: process.env.PGPASSWORD || '',
         database: process.env.PGDATABASE || 'postgres',
     });
 
@@ -542,7 +542,7 @@ const agregarEstudiante = async (obj) => {
         host: process.env.PGHOST || 'localhost',
         port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
         user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || 'wwssadadqe',
+        password: process.env.PGPASSWORD || '',
         database: process.env.PGDATABASE || 'postgres',
     });
 
@@ -576,7 +576,7 @@ const agregarInscripcion = async (obj) => {
         host: process.env.PGHOST || 'localhost',
         port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
         user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || 'wwssadadqe',
+        password: process.env.PGPASSWORD || '',
         database: process.env.PGDATABASE || 'postgres',
     });
 
