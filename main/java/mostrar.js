@@ -1,6 +1,14 @@
-let url = document.location.href;
+import {getObject, emptyMessage, loadingLogo, crearBoton} from "./funciones.js";
 
-let params = url.split('?')[1];
+let url = document.location.href;
+let params;
+
+try {
+    params = url.split('?')[1];
+} catch {
+    alert("URL no válida.");
+    window.location='./index.html';
+}
 
 let type = params.split('=')[0];
 let id = parseInt(params.split('=')[1]);
@@ -10,12 +18,29 @@ if (type == "cur"){
 }
 
 async function fullInfoCur(){
+
+    let usuarioActual = 0;
+
     document.getElementById("otro").appendChild(document.createTextNode("Información de curso"));
     loadingLogo();
+    let curso;
     
-    let curso = await getSingleObject(`mostrar.html/cursos/${id}`);
+    try {
+        curso = await getObject(`/cursos/${id}`);
+    } catch {
+        alert("Curso no encontrado.");
+        window.location='./index.html';
+        return;
+    }
     
-    let usuario = await getSingleObject(`mostrar.html/usuarios/${curso.idUsuarioModificacion}`);
+    let usuario, usuNom;
+
+    try {
+        usuario = await getObject(`/usuarios/${curso.idUsuarioModificacion}`);
+        usuNom = usuario.nombreUsuario;
+    } catch {
+        usuNom = 'usuario no encontrado';
+    }
     
     let info = document.getElementById("themain");
     let br = document.createElement('br');
@@ -28,7 +53,7 @@ async function fullInfoCur(){
     
     let del = document.createElement("button");
     del.addEventListener("click", async () => {
-        let ret = await borrar(`cursos/${id}`);
+        let ret = await borrar(`/cursos/${id}/${usuarioActual}`);
         if (ret){
             alert("Curso eliminado correctamente");
             window.location='./index.html';
@@ -78,7 +103,7 @@ async function fullInfoCur(){
     moreinfo = document.createElement("p");
     moreinfo.classList.add("morefullinfo");
             
-    moreinfo.appendChild(document.createTextNode(`Última modificación: ${mod} hecha por: ${usuario.nombre}`));
+    moreinfo.appendChild(document.createTextNode(`Última modificación: ${mod} hecha por: ${usuNom}`));
     
     infoart.appendChild(moreinfo);
     
@@ -95,11 +120,28 @@ if (type == "est"){
 }
 
 async function fullInfoEst(){
-    loadingLogo();
 
-    let estudiante = await getSingleObject(`mostrar.html/estudiantes/${id}`);
+    let usuarioActual = 0;
+
+    loadingLogo();
+    let estudiante;
+
+    try {
+        estudiante = await getObject(`/estudiantes/${id}`);
+    } catch {
+        alert("Estudiante no encontrado.");
+        window.location='./index.html';
+        return;
+    }
     
-    let usuario = await getSingleObject(`mostrar.html/usuarios/${estudiante.idUsuarioModificacion}`);
+    let usuario, usuNom;
+
+    try {
+        usuario = await getObject(`/usuarios/${estudiante.idUsuarioModificacion}`);
+        usuNom = usuario.nombreUsuario;
+    } catch {
+        usuNom = 'usuario no encontrado';
+    }
 
     let info = document.getElementById("themain");
     let br = document.createElement('br');
@@ -114,7 +156,7 @@ async function fullInfoEst(){
 
     let del = document.createElement("button");
     del.addEventListener("click", async () => {
-        let ret = await borrar(`estudiantes/${id}`);
+        let ret = await borrar(`/estudiantes/${id}/${usuarioActual}`);
         if (ret){
             alert("Estudiante eliminado correctamente");
             window.location='./index.html';
@@ -149,7 +191,7 @@ async function fullInfoEst(){
     infoart.appendChild(moreinfo);
     moreinfo = document.createElement("p");
     moreinfo.classList.add("morefullinfo");
-    moreinfo.appendChild(document.createTextNode(`Última modificación: ${mod} hecha por: ${usuario.nombre}`));
+    moreinfo.appendChild(document.createTextNode(`Última modificación: ${mod} hecha por: ${usuNom}`));
 
     infoart.appendChild(moreinfo);
     
@@ -160,65 +202,48 @@ async function fullInfoEst(){
     crearBoton("Editar",`./editstudy.html?est=${id}`);
 }
 
-function crearBoton(text,path){
-
-    let main = document.getElementById("themain");
-
-    let crart = document.createElement("article");
-    crart.classList.add("listarticle");
-
-    let create = document.createElement("button");
-
-    create.classList.add("crearButton");
-    create.appendChild(document.createTextNode(text));
-    create.setAttribute("onclick", `window.location='${path}'`);
-    crart.appendChild(create);
-    crart.appendChild(document.createElement('br'));
-    main.appendChild(crart);
-}
-
-async function borrar(path){
-    let resp;
-
-    let promise = new Promise((resolve, reject) => {
-        setTimeout(async () => {
-            const response = await fetch(path,{method: 'DELETE'});
-            if (!response.ok) {
-                setTimeout(async () => {
-                    const response = await fetch(path,{method: 'DELETE'});
-                    if (!response.ok) {
-                        reject("Error al borrar");
-                        return;
-                    }
-                    resp = await response;
-                    resolve("terminé!");
-                }, 1000)
-                return;
-            }
-            resp = await response;
-            resolve("terminé!");
-        }, 10)
-    });
-
-    await promise;
-
-    return resp;
-}
-
 if (type == "ins"){
     document.getElementById("otro").appendChild(document.createTextNode("Información de Inscripción"));
     fullInfoIns();
 }
 
 async function fullInfoIns(){
+
+    let usuarioActual = 0;
+
     loadingLogo();
 
-    let inscripcion = await getSingleObject(`/mostrar.html/inscripciones/${id}`);
-
-    let estudiante = await getSingleObject(`mostrar.html/estudiantes/${inscripcion.idEstudiante}`);
-    let curso = await getSingleObject(`mostrar.html/cursos/${inscripcion.idCurso}`);
+    let inscripcion;
+    try {
+        inscripcion = await getObject(`/inscripciones/${id}`);
+    } catch {
+        alert("Inscripción no encontrada.");
+        window.location='./index.html';
+        return;
+    }
+    let nomEst = '';
+    let nomCur = '';
+    try {
+        let estudiante = await getObject(`/estudiantes/${inscripcion.idEstudiante}`);
+        nomEst = `${estudiante.apellido} ${estudiante.nombres}`;
+    } catch {
+        nomEst = 'No registrado';
+    }
+    try {
+        let curso = await getObject(`/cursos/${inscripcion.idCurso}`);
+        nomCur = curso.nombre;
+    } catch {
+        nomCur = 'Curso no registrado';
+    }
     
-    let usuario = await getSingleObject(`mostrar.html/usuarios/${inscripcion.idUsuarioModificacion}`);
+    let usuario, usuNom;
+
+    try {
+        usuario = await getObject(`/usuarios/${inscripcion.idUsuarioModificacion}`);
+        usuNom = usuario.nombreUsuario;
+    } catch {
+        usuNom = 'usuario no encontrado';
+    }
 
     let info = document.getElementById("themain");
     let br = document.createElement('br');
@@ -233,7 +258,7 @@ async function fullInfoIns(){
 
     let del = document.createElement("button");
     del.addEventListener("click", async () => {
-        let ret = await borrar(`inscripciones/${id}`);
+        let ret = await borrar(`/inscripciones/${id}/${usuarioActual}`);
         if (ret){
             alert("Inscripción eliminada correctamente");
             window.location='./index.html';
@@ -257,12 +282,12 @@ async function fullInfoIns(){
     
     infoart.appendChild(del);
     moreinfo.classList.add("morefullinfo");
-    moreinfo.appendChild(document.createTextNode(`Curso: ${curso.nombre}`));
+    moreinfo.appendChild(document.createTextNode(`Curso: ${nomCur}`));
     infoart.appendChild(moreinfo);
 
     moreinfo = document.createElement("p");
     moreinfo.classList.add("morefullinfo");
-    moreinfo.appendChild(document.createTextNode(`Estudiante: ${estudiante.apellido} ${estudiante.nombres}`));
+    moreinfo.appendChild(document.createTextNode(`Estudiante: ${nomEst}`));
     infoart.appendChild(moreinfo);
     moreinfo = document.createElement("p");
     moreinfo.classList.add("morefullinfo");
@@ -270,7 +295,7 @@ async function fullInfoIns(){
     infoart.appendChild(moreinfo);
     moreinfo = document.createElement("p");
     moreinfo.classList.add("morefullinfo");
-    moreinfo.appendChild(document.createTextNode(`Última modificación: ${mod} hecha por: ${usuario.nombre}`));
+    moreinfo.appendChild(document.createTextNode(`Última modificación: ${mod} hecha por: ${usuNom}`));
 
     infoart.appendChild(moreinfo);
     
@@ -279,93 +304,46 @@ async function fullInfoIns(){
     info.appendChild(infoart);
 }
 
-function crearBoton(text,path){
-
-    let main = document.getElementById("themain");
-
-    let crart = document.createElement("article");
-    crart.classList.add("listarticle");
-
-    let create = document.createElement("button");
-
-    create.classList.add("crearButton");
-    create.appendChild(document.createTextNode(text));
-    create.setAttribute("onclick", `window.location='${path}'`);
-    crart.appendChild(create);
-    crart.appendChild(document.createElement('br'));
-    main.appendChild(crart);
-}
-
-function loadingLogo(){
-    let main = document.getElementById("themain");
-    let br = document.createElement('br');
-
-    let loadart = document.createElement("article");
-
-    loadart.classList.add("listarticle");
-    
-    let mozza = document.createElement("img");
-    mozza.src = "./image/Loading.gif";
-    mozza.alt = "Mozzarella Cookie Loading";
-    mozza.style = "height: 60px; margin-left: 47%";
-
-    loadart.appendChild(mozza);
-
-    main.appendChild(loadart);
-}
-
-async function borrar(path){
+async function borrar(path, attempt){
     let resp;
+
+    if (!attempt){
+        attempt = 0;
+    }
+    if (attempt >= 5){
+        throw new Error("Error de red");
+        return;
+    }
 
     let promise = new Promise((resolve, reject) => {
         setTimeout(async () => {
             const response = await fetch(path,{method: 'DELETE'});
             if (!response.ok) {
-                setTimeout(async () => {
-                    const response = await fetch(path,{method: 'DELETE'});
-                    if (!response.ok) {
-                        reject("Error al borrar");
-                        return;
-                    }
-                    resp = await response;
-                    resolve("terminé!");
-                }, 1000)
+                reject(response.status);
                 return;
             }
-            resp = await response;
-            resolve("terminé!");
-        }, 10)
+            resolve(response);
+        }, 100*(attempt+1))
     });
 
-    await promise;
-
-    return resp;
-}
-
-async function getSingleObject(path) {
-    let resp;
-
-    let promise = new Promise((resolve, reject) => {
-        setTimeout(async () => {
-            const response = await fetch(path);
-            if (!response.ok) {
-                setTimeout(async () => {
-                    const response = await fetch(path);
-                    if (!response.ok) {
-                        reject("Error al borrar");
-                        return;
-                    }
-                    resp = await response.json();
-                    resolve("terminé!");
-                }, 1000)
-                return;
+    promise.then(
+        function(response) {resp = response},
+        function(error) {
+            if (error == 404){
+                throw new Error('Objeto no encontrado');
             }
-            resp = await response.json();
-            resolve("terminé!");
-        }, 10)
-    });
+        }
+    );
 
-    await promise;
+    try {
+        await promise;
+    } catch (error) {
+        if (error.message == 'Objeto no encontrado'){
+            throw error;
+        } else{
+            return borrar(path,attempt+1);
+        }
+    }
 
     return resp;
 }

@@ -1,3 +1,5 @@
+import {getObject, loadingLogo, emptyMessage, crearBoton} from "./funciones.js";
+
 let dashnav = document.getElementById("dashboard");
 let estudiantenav = document.getElementById("estudiante");
 let cursonav = document.getElementById("curso");
@@ -31,8 +33,16 @@ estudiantenav.addEventListener('click', async () => {
     currentNav = 1;
     currentPage = 0;
     loadingLogo();
-    let estudiantes = await getPromise(`index.html/estudiantes/0`);
-    let estlen = await getPromise("index.html/estudiantes/lenght");
+    let estudiantes;
+    let estlen = 0;
+
+    try {
+        estudiantes = await getObject(`estudiantes/0/10`);
+        estudiantes = JSON.parse(estudiantes);
+        estlen = await getObject("estudiantes/lenght");
+    } catch {
+
+    }
     
     document.getElementById("themain").lastChild.remove();
 
@@ -66,8 +76,15 @@ cursonav.addEventListener('click', async () => {
     currentNav = 2;
     currentPage = 0;
     loadingLogo();
-    let cursos = await getPromise(`index.html/cursos/0`);
-    let curlen = await getPromise("index.html/cursos/lenght");
+    let cursos;
+    let curlen = 0;
+    try {
+        cursos = await getObject(`cursos/0/10`);
+        cursos = JSON.parse(cursos);
+        curlen = await getObject("cursos/lenght");
+    } catch {
+
+    }
 
     document.getElementById("themain").lastChild.remove();
 
@@ -101,18 +118,21 @@ inscripcionnav.addEventListener('click', async () => {
     currentNav = 3;
     currentPage = 0;
     loadingLogo();
-    let inscripciones = await getPromise(`index.html/inscripciones/0`);
-    let inslen = await getPromise("index.html/inscripciones/lenght");
-    
-    document.getElementById("themain").lastChild.remove();
+    let inscripciones;
+    let inslen = 0;
 
-    let j = 0;
-    for (let inscripcion of inscripciones){
-        await showInscripcionInfo(inscripcion.idInscripcion,inscripcion.idCurso,inscripcion.idEstudiante,j%2);
-        j++;
-    }
-
-    if (inslen == 0){
+    try {
+        inscripciones = await getObject(`inscripciones/0/10`);
+        inscripciones = JSON.parse(inscripciones)
+        inslen = await getObject("inscripciones/lenght");
+        document.getElementById("themain").lastChild.remove();
+        let j = 0;
+        for (let inscripcion of inscripciones){
+            await showInscripcionInfo(inscripcion.idInscripcion,inscripcion.idCurso,inscripcion.idEstudiante,j%2);
+            j++;
+        }
+    } catch {
+        document.getElementById("themain").lastChild.remove();
         emptyMessage("inscripciones");
         pageBoton(-1);
     }
@@ -134,12 +154,25 @@ async function showDash(){
     
     mainart.classList.add("maininfo");
     loadingLogo();
+    let cursos;
+    
+    let curlen = 0;
+    let estlen = 0;
 
-    let cursos = await getPromise("index.html/cursos");
-    let curlen = await getPromise("index.html/cursos/lenght");
-    let estlen = await getPromise("index.html/estudiantes/lenght");
+    try {
+        curlen = await getObject("cursos/lenght");
+    } catch {
+        curlen = 'Error al cargar cursos';
+    }
+
+    try {
+        estlen = await getObject("estudiantes/lenght");
+    } catch {
+        estlen = 'Error al cargar estudiantes';
+    }
     
     document.getElementById("themain").lastChild.remove();
+    //esto remueve el ícono de carga antes de comenzar a llenar la página
 
     mainart.appendChild(document.createTextNode(`Cantidad total de cursos: ${curlen}`));
     mainart.appendChild(br);
@@ -154,11 +187,18 @@ async function showDash(){
 
     main.appendChild(mainart);
 
-    let j = 1;
-    for (let curso of cursos){
-        showCursoInfo(curso.idCurso,curso.nombre, curso.fechaInicio,curso.cantidadHoras,j%2);
-        j++;
-        if (j == 4) break;
+    try {
+        cursos = await getObject("cursos/0/3");
+        cursos = JSON.parse(cursos);
+
+        let j = 1;
+        for (let curso of cursos){
+            showCursoInfo(curso.idCurso,curso.nombre, curso.fechaInicio,curso.cantidadHoras,j%2);
+            j++;
+            // if (j == 4) break;
+        }
+    } catch {
+        emptyMessage("cursos");
     }
     
 }
@@ -175,23 +215,6 @@ function clearPage(){
     while (page.firstChild){
         page.lastChild.remove();
     }
-}
-
-function crearBoton(text,path){
-
-    let main = document.getElementById("themain");
-
-    let crart = document.createElement("article");
-    crart.classList.add("listarticle");
-
-    let create = document.createElement("button");
-
-    create.classList.add("crearButton");
-    create.appendChild(document.createTextNode(text));
-    create.setAttribute("onclick", `window.location='${path}'`);
-    crart.appendChild(create);
-    crart.appendChild(document.createElement('br'));
-    main.appendChild(crart);
 }
 
 function pageBoton(num){
@@ -236,63 +259,57 @@ async function changePage(num){
     let j = 0;
 
     if (currentNav == 1){
-        let estudiantes = await getPromise(`index.html/estudiantes/${currentPage}`);
-        document.getElementById("themain").lastChild.remove();
-        for (let estudiante of estudiantes){
-            showEstudianteInfo(estudiante.idEstudiante,estudiante.apellido,estudiante.nombres,estudiante.documento,estudiante.email,j%2);
-            j++;
+        try {
+            let estudiantes = await getObject(`estudiantes/${currentPage}/10`);
+            estudiantes = JSON.parse(estudiantes);
+            document.getElementById("themain").lastChild.remove();
+            for (let estudiante of estudiantes){
+                showEstudianteInfo(estudiante.idEstudiante,estudiante.apellido,estudiante.nombres,estudiante.documento,estudiante.email,j%2);
+                j++;
+            }
+        } catch {
+            document.getElementById("themain").lastChild.remove();
+            emptyMessage("estudiantes");
         }
+        
+        
+        
+        crearBoton("Agregar estudiante","./addstudy.html");
     }
 
     if (currentNav == 2){
-        let cursos = await getPromise(`index.html/cursos/${currentPage}`);
-        document.getElementById("themain").lastChild.remove();
-        for (let curso of cursos){
-            showCursoInfo(curso.idCurso,curso.nombre, curso.fechaInicio,curso.cantidadHoras,j%2);
-            j++;
+        try {
+            let cursos = await getObject(`cursos/${currentPage}/10`);
+            cursos = JSON.parse(cursos);
+            document.getElementById("themain").lastChild.remove();
+            for (let curso of cursos){
+                showCursoInfo(curso.idCurso,curso.nombre, curso.fechaInicio,curso.cantidadHoras,j%2);
+                j++;
+            }
+        } catch {
+            document.getElementById("themain").lastChild.remove();
+            emptyMessage("cursos");
         }
+        
+        crearBoton("Crear curso","./crearcurso.html");
     }
     
     if (currentNav == 3){
-        let inscripciones = await getPromise(`index.html/inscripciones/${currentPage}`);
-        document.getElementById("themain").lastChild.remove();
-        for (let inscripcion of inscripciones){
-            showInscripcionInfo(inscripcion.idInscripcion,inscripcion.idCurso,inscripcion.idEstudiante,j%2);
-            j++;
+        try {
+            let inscripciones = await getObject(`inscripciones/${currentPage}/10`);
+            inscripciones = JSON.parse(inscripciones);
+            document.getElementById("themain").lastChild.remove();
+            for (let inscripcion of inscripciones){
+                showInscripcionInfo(inscripcion.idInscripcion,inscripcion.idCurso,inscripcion.idEstudiante,j%2);
+                j++;
+            }
+        } catch {
+            document.getElementById("themain").lastChild.remove();
+            emptyMessage("inscripciones");
         }
+        
+        crearBoton("Crear inscripcion","./crearinscripcion.html");
     }
-}
-
-function emptyMessage(item){
-    let main = document.getElementById("themain");
-    let br = document.createElement('br');
-
-    let emptyart = document.createElement("article");
-
-    emptyart.classList.add("listarticle");
-    emptyart.classList.add("articleclaro");
-    emptyart.style = "color: rgb(73, 64, 92);";
-    emptyart.appendChild(document.createTextNode(`No se encontraron datos de ${item}`));
-
-    main.appendChild(emptyart);
-}
-
-function loadingLogo(){
-    let main = document.getElementById("themain");
-    let br = document.createElement('br');
-
-    let loadart = document.createElement("article");
-
-    loadart.classList.add("listarticle");
-    
-    let mozza = document.createElement("img");
-    mozza.src = "./image/Loading.gif";
-    mozza.alt = "Mozzarella Cookie Loading";
-    mozza.style = "height: 60px; margin-left: 47%";
-
-    loadart.appendChild(mozza);
-
-    main.appendChild(loadart);
 }
 
 function showCursoInfo(id, nom, inicio, hora, pair){
@@ -397,64 +414,6 @@ async function showInscripcionInfo(id, idcur, idest, pair){
     estudianteart.appendChild(moreinfo);
 
     main.appendChild(estudianteart);
-}
-
-async function getPromise(path) {
-    let obj;
-
-    let promise = new Promise((resolve, reject) => {
-        setTimeout(async () => {
-            const response = await fetch(path);
-            if (!response.ok) {
-                setTimeout(async () => {
-                    const response = await fetch(path);
-                    if (!response.ok) {
-                        reject("Error al consultar");
-                        return;
-                    }
-                    let aux = await response.json();
-                    obj = JSON.parse(aux);
-                    resolve("terminé!");
-                }, 1000)
-                return;
-            }
-            let aux = await response.json();
-            obj = JSON.parse(aux);
-            resolve("terminé!");
-        }, 10)
-    });
-
-    await promise;
-
-    return obj;
-}
-
-async function getSingleObject(path) {
-    let resp;
-
-    let promise = new Promise((resolve, reject) => {
-        setTimeout(async () => {
-            const response = await fetch(path);
-            if (!response.ok) {
-                setTimeout(async () => {
-                    const response = await fetch(path);
-                    if (!response.ok) {
-                        reject("Error al borrar");
-                        return;
-                    }
-                    resp = await response.json();
-                    resolve("terminé!");
-                }, 1000)
-                return;
-            }
-            resp = await response.json();
-            resolve("terminé!");
-        }, 10)
-    });
-
-    await promise;
-
-    return resp;
 }
 
 showDash();

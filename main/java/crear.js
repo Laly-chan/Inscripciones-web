@@ -34,12 +34,17 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
             if (valErr === 0){
                 let cur = new Curso(0,nom,desc,ini,hora,max,valEst,1,new Date());
-                let ret = await crear("/cursos/",cur);
-                if (ret){
-                    alert("Datos guardados correctamente");
-                    window.location='./index.html';
+                try {
+                    let ret = await crear("/cursos/",cur);
+                    if (ret){
+                        alert("Datos guardados correctamente");
+                        window.location='./index.html';
+                    }
+                } catch {
+                    valErr++;
                 }
-            } else {
+            }
+            if (valErr >= 1) {
                 document.getElementById("buttonform").style = "color: red";
                 document.getElementById("buttonform").lastChild.remove();
                 document.getElementById("buttonform").appendChild(document.createTextNode(`Hay campos vacios o con información errónea.`));
@@ -78,12 +83,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (valErr === 0){
                 let est = new Estudiante(0,doc,app,nom,mail,nac,1,1,new Date());
-                let ret = await crear("/estudiantes/",est);
-                if (ret){
-                    alert("Datos guardados correctamente");
-                    window.location='./index.html';
+                try { 
+                    let ret = await crear("/estudiantes/",est);
+                    if (ret){
+                        alert("Datos guardados correctamente");
+                        window.location='./index.html';
+                    }
+                } catch {
+                    valErr++;
                 }
-            } else {
+            }
+            if (valErr >= 1){
                 document.getElementById("buttonform").style = "color: red";
                 document.getElementById("buttonform").lastChild.remove();
                 document.getElementById("buttonform").appendChild(document.createTextNode(`Hay campos vacios o con información errónea.`));
@@ -102,58 +112,71 @@ document.addEventListener("DOMContentLoaded", async () => {
             let est = document.getElementById("idest").value;
             let dat = document.getElementById("fechains").value;
 
-            if (!cur.match("[0-9]")){
+            if (!cur.match("^[0-9]*$")){
                 valErr++;
             }
-            if (!est.match("[0-9]")){
+            if (!est.match("^[0-9]*$")){
                 valErr++;
             }
             if (dat === ""){
                 valErr++;
             }
 
+            let errMsg = 'Hay campos vacios o con información errónea.';
+
             if (valErr === 0){
                 let insc = new Inscripcion(0,cur,est,dat,1,1,new Date());
-                let ret = await crear("/inscripciones/",insc);
-                if (ret){
-                    alert("Datos guardados correctamente");
-                    window.location='./index.html';
+                try {
+                    let ret = await crear("/inscripciones/",insc);
+                    if (ret){
+                        alert("Datos guardados correctamente");
+                        window.location='./index.html';
+                    }
+                } catch (error) {
+                    valErr++;
                 }
-            } else {
+            }
+            
+            if (valErr >= 1){
                 document.getElementById("buttonform").style = "color: red";
                 document.getElementById("buttonform").lastChild.remove();
-                document.getElementById("buttonform").appendChild(document.createTextNode(`Hay campos vacios o con información errónea.`));
+                document.getElementById("buttonform").appendChild(document.createTextNode(errMsg));
             }
         });
     }
 });
 
-async function crear(path,obj){
-    let resp;
+async function crear(path,obj,attempt){
+    let resp = false;
 
-    path = path + JSON.stringify(obj);
+    if (!attempt){
+        attempt = 0;
+    }
+    if (attempt >= 5){
+        return false;
+    }
 
     let promise = new Promise((resolve, reject) => {
         setTimeout(async () => {
-            const response = await fetch(path,{method: 'POST'});
-            if (!response.ok) {
-                setTimeout(async () => {
-                    const response = await fetch(path,{method: 'POST'});
-                    if (!response.ok) {
-                        reject("Error al crear");
-                        return;
-                    }
-                    resp = await response;
-                    resolve("terminé!");
-                }, 1000)
-                return;
-            }
-            resp = await response;
-            resolve("terminé!");
-        }, 10)
+            const response = await fetch(path,{method: 'POST', body: JSON.stringify(obj),
+                headers: {
+                    "Content-Type": "application/json",
+                }})
+            resolve(response.ok);
+        }, 100*(attempt+1))
     });
 
-    await promise;
+    promise.then(
+        function(response) {resp = response},
+        function(error) {
+        }
+    );
+
+    try {
+        await promise;
+    } catch {
+        return crear(path,obj,attempt+1);
+    }
 
     return resp;
 }
