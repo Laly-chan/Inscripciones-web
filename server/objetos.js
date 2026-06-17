@@ -11,22 +11,6 @@ class Estudiante{
         this.idUsuarioModificacion = usuario;
         this.fechaHoraModificacion = mod;
     }
-
-    editar(documento, nombre, apellido, mail, nacimiento, usuario){
-        this.documento = documento;
-        this.apellido = apellido;
-        this.nombres = nombre;
-        this.email = mail;
-        this.fechaNacimiento = nacimiento;
-        this.idUsuarioModificacion = usuario;
-        this.fechaHoraModificacion = new Date();
-    }
-
-    borrar(usuario){
-        this.activo = 0;
-        this.idUsuarioModificacion = usuario;
-        this.fechaHoraModificacion = new Date();
-    }
 }
 
 class Curso{
@@ -42,23 +26,6 @@ class Curso{
         this.idUsuarioModificacion = usuario;
         this.fechaHoraModificacion = mod;
     }
-
-    editar(nombre, desc, inicio, horas, max, est, usuario){
-        this.nombre = nombre;
-        this.descripcion = desc;
-        this.fechaInicio = inicio;
-        this.cantidadHoras = horas;
-        this.inscriptosMax = max;
-        this.cursoEstado = est;
-        this.idUsuarioModificacion = usuario;
-        this.fechaHoraModificacion = new Date();
-    }
-
-    borrar(usuario){
-        this.idCursoEstado = 4; //Eliminado
-        this.idUsuarioModificacion = usuario;
-        this.fechaHoraModificacion = new Date();
-    }
 }
 
 class Inscripcion{
@@ -71,21 +38,14 @@ class Inscripcion{
         this.idUsuarioModificacion = usuario;
         this.fechaHoraModificacion = mod;
     }
-
-    borrar(usuario){
-        this.idInscripcionEstado = 2;
-        this.idUsuarioModificacion = usuario;
-        this.fechaHoraModificacion = new Date();
-    }
 }
 
 class Usuario{
-    constructor(id,apellido,nombre,nom_usuario,contra,activo){
+    constructor(id,apellido,nombre,nom_usuario,activo){
         this.idUsuario = id;
         this.apellido = apellido;
         this.nombre = nombre;
         this.nombreUsuario = nom_usuario;
-        //this.contrasenia = contra;
         this.activo = activo;
     }
 }

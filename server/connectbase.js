@@ -1,17 +1,40 @@
 import { Client } from 'pg';
 
-const main = async () => {
+const mainGet = async (object,base,limit,offset,filter,order) => {
     const client = new Client({
         host: process.env.PGHOST || 'localhost',
         port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
         user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || '',
-        database: process.env.PGDATABASE || 'postgres',
+        password: process.env.PGPASSWORD || 'wwssadadqe', //por algún motivo no carga la contraseña del .env
+        database: process.env.PGDATABASE || '',
     });
+
+    let strLimit = '';
+    let strOff = '';
+    let strFilter = '';
+    let strOrder = '';
+
+    if (limit){
+        strLimit = `LIMIT ${limit} `;
+    }
+
+    if (offset){
+        strOff = `OFFSET ${offset} `;
+    }
+    
+    if (filter){
+        strFilter = `WHERE ${filter.replaceAll(',',' AND ')}`
+    }
+
+    if (order){
+        strOrder = `ORDER BY ${order}`
+    }
 
     try {
         await client.connect();
-        const result = await client.query('SELECT * FROM public.cursos');
+        const result = await client.query(`SELECT ${object} FROM public.${base} 
+                                           ${strFilter} ${strOrder} ${strLimit} ${strOff}`);
+            await client.end();
         return result.rows;
     } catch (err) {
         console.error('Error consultando PostgreSQL:', err);
@@ -25,27 +48,76 @@ const main = async () => {
     }
 }
 
-const getEstudiantePage = async (pag) => {
+const mainSet = async (base,edit,id,info) => {
     const client = new Client({
         host: process.env.PGHOST || 'localhost',
         port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
         user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || '',
-        database: process.env.PGDATABASE || 'postgres',
+        password: process.env.PGPASSWORD || 'wwssadadqe',
+        database: process.env.PGDATABASE || '',
     });
 
-    let start = pag*10;
+    let strEdit = '';
+    let strId = '';
+    
+    if (edit){
+        strEdit = `SET ${edit}`;
+    }
+    if (id){
+        strId = `WHERE ${id}`;
+    }
 
     try {
         await client.connect();
-        const result = await client.query(`SELECT * FROM public.estudiantes WHERE activo != 0 LIMIT 10 OFFSET ${start}`);
-        return result.rows;
+        await client.query(`UPDATE public.${base} ${strEdit} ${strId}`,info);
+        await client.end();
+        return true;
     } catch (err) {
         console.error('Error consultando PostgreSQL:', err);
         process.exitCode = 1;
     } finally {
         try {
             await client.end();
+            return false;
+        } catch {
+
+        }
+    }
+}
+
+const mainAdd = async (base,info,data) => {
+    const client = new Client({
+        host: process.env.PGHOST || 'localhost',
+        port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
+        user: process.env.PGUSER || 'postgres',
+        password: process.env.PGPASSWORD || 'wwssadadqe', //por algún motivo no carga la contraseña del .env
+        database: process.env.PGDATABASE || '',
+    });
+
+    let strInfo = '';
+    let idOffset = 1;
+    
+    if (base == 'estudiantes'){
+        idOffset = 6; //por algún motivo el id de los estudiantes se saltea los primeros 5 puestos y ocupa los últimos 5, por eso el +6
+    }
+
+    try {
+        await client.connect();
+        let last = await client.query(`SELECT COUNT(*) FROM public.${base}`);
+        let newid = parseInt(last.rows.pop().count) + idOffset;
+        if (info){
+            strInfo = `VALUES (${newid},${info})`;
+        }
+        await client.query(`INSERT INTO public.${base} ${strInfo}`,data);
+        await client.end();
+        return true;
+    } catch (err) {
+        console.error('Error consultando PostgreSQL:', err);
+        process.exitCode = 1;
+    } finally {
+        try {
+            await client.end();
+            return false;
         } catch {
 
         }
@@ -53,556 +125,72 @@ const getEstudiantePage = async (pag) => {
 }
 
 const getLenghtEstudiante = async () => {
-    const client = new Client({
-        host: process.env.PGHOST || 'localhost',
-        port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
-        user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || '',
-        database: process.env.PGDATABASE || 'postgres',
-    });
 
-    try {
-        await client.connect();
-        const result = await client.query(`SELECT COUNT(*) FROM public.estudiantes WHERE activo != 0`);
-        return parseInt(result.rows.pop().count);
-    } catch (err) {
-        console.error('Error consultando PostgreSQL:', err);
-        process.exitCode = 1;
-    } finally {
-        try {
-            await client.end();
-        } catch {
+    let filtro = `activo != 0`;
 
-        }
-    }
-}
+    let count = await mainGet('COUNT(*)','estudiantes',undefined,undefined,filtro);
 
-const getEstudiante = async (id) => {
-    const client = new Client({
-        host: process.env.PGHOST || 'localhost',
-        port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
-        user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || '',
-        database: process.env.PGDATABASE || 'postgres',
-    });
-
-    try {
-        await client.connect();
-        const result = await client.query(`SELECT * FROM public.estudiantes WHERE id_estudiante = ${id}`);
-        return result.rows[0];
-    } catch (err) {
-        console.error('Error consultando PostgreSQL:', err);
-        process.exitCode = 1;
-    } finally {
-        try {
-            await client.end();
-        } catch {
-
-        }
-    }
-}
-
-const getCursoPage = async (pag) => {
-    const client = new Client({
-        host: process.env.PGHOST || 'localhost',
-        port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
-        user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || '',
-        database: process.env.PGDATABASE || 'postgres',
-    });
-
-    let start = pag*10;
-
-    try {
-        await client.connect();
-        const result = await client.query(`SELECT * FROM public.cursos WHERE id_curso_estado != 4 LIMIT 10 OFFSET ${start}`);
-        return result.rows;
-    } catch (err) {
-        console.error('Error consultando PostgreSQL:', err);
-        process.exitCode = 1;
-    } finally {
-        try {
-            await client.end();
-        } catch {
-
-        }
-    }
+    return parseInt(count.pop().count);
 }
 
 const getLenghtCurso = async () => {
-    const client = new Client({
-        host: process.env.PGHOST || 'localhost',
-        port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
-        user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || '',
-        database: process.env.PGDATABASE || 'postgres',
-    });
+    
+    let filtro = `id_curso_estado != 4`;
 
-    try {
-        await client.connect();
-        const result = await client.query(`SELECT COUNT(*) FROM public.cursos WHERE id_curso_estado != 4`);
-        return parseInt(result.rows.pop().count);
-    } catch (err) {
-        console.error('Error consultando PostgreSQL:', err);
-        process.exitCode = 1;
-    } finally {
-        try {
-            await client.end();
-        } catch {
+    let count = await mainGet('COUNT(*)','cursos',undefined,undefined,filtro);
 
-        }
-    }
-}
-
-const getCurso = async (id) => {
-    const client = new Client({
-        host: process.env.PGHOST || 'localhost',
-        port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
-        user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || '',
-        database: process.env.PGDATABASE || 'postgres',
-    });
-
-    try {
-        await client.connect();
-        const result = await client.query(`SELECT * FROM public.cursos WHERE id_curso = ${id}`);
-        return result.rows[0];
-    } catch (err) {
-        console.error('Error consultando PostgreSQL:', err);
-        process.exitCode = 1;
-    } finally {
-        try {
-            await client.end();
-        } catch {
-
-        }
-    }
-}
-
-const getInscripcionPage = async (pag) => {
-    const client = new Client({
-        host: process.env.PGHOST || 'localhost',
-        port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
-        user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || '',
-        database: process.env.PGDATABASE || 'postgres',
-    });
-
-    let start = pag*10;
-
-    try {
-        await client.connect();
-        const result = await client.query(`SELECT * FROM public.inscripciones WHERE id_inscripcion_estado != 2 LIMIT 10 OFFSET ${start}`);
-        return result.rows;
-    } catch (err) {
-        console.error('Error consultando PostgreSQL:', err);
-        process.exitCode = 1;
-    } finally {
-        try {
-            await client.end();
-        } catch {
-
-        }
-    }
+    return parseInt(count.pop().count);
 }
 
 const getLenghtInscripcion = async () => {
-    const client = new Client({
-        host: process.env.PGHOST || 'localhost',
-        port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
-        user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || '',
-        database: process.env.PGDATABASE || 'postgres',
-    });
 
-    try {
-        await client.connect();
-        const result = await client.query(`SELECT COUNT(*) FROM public.inscripciones WHERE id_inscripcion_estado != 2`);
-        return parseInt(result.rows.pop().count);
-    } catch (err) {
-        console.error('Error consultando PostgreSQL:', err);
-        process.exitCode = 1;
-    } finally {
-        try {
-            await client.end();
-        } catch {
+    let filtro = `id_inscripcion_estado != 2`;
 
-        }
-    }
-}
+    let count = await mainGet('COUNT(*)','inscripciones',undefined,undefined,filtro);
 
-const getInscripcion = async (id) => {
-    const client = new Client({
-        host: process.env.PGHOST || 'localhost',
-        port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
-        user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || '',
-        database: process.env.PGDATABASE || 'postgres',
-    });
-
-    try {
-        await client.connect();
-        const result = await client.query(`SELECT * FROM public.inscripciones WHERE id_inscripcion = ${id}`);
-        return result.rows[0];
-    } catch (err) {
-        console.error('Error consultando PostgreSQL:', err);
-        process.exitCode = 1;
-    } finally {
-        try {
-            await client.end();
-        } catch {
-
-        }
-    }
+    return parseInt(count.pop().count);
 }
 
 const getCursosEstados = async () => {
-    const client = new Client({
-        host: process.env.PGHOST || 'localhost',
-        port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
-        user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || '',
-        database: process.env.PGDATABASE || 'postgres',
-    });
 
-    try {
-        await client.connect();
-        const result = await client.query(`SELECT * FROM public.cursos_estados`);
-        return result.rows;
-    } catch (err) {
-        console.error('Error consultando PostgreSQL:', err);
-        process.exitCode = 1;
-    } finally {
-        try {
-            await client.end();
-        } catch {
-
-        }
-    }
+    return await mainGet('*','cursos_estados');
 }
 
 const getInscripcionesEstados = async () => {
-    const client = new Client({
-        host: process.env.PGHOST || 'localhost',
-        port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
-        user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || '',
-        database: process.env.PGDATABASE || 'postgres',
-    });
-
-    try {
-        await client.connect();
-        const result = await client.query(`SELECT * FROM public.inscripciones_estados`);
-        return result.rows;
-    } catch (err) {
-        console.error('Error consultando PostgreSQL:', err);
-        process.exitCode = 1;
-    } finally {
-        try {
-            await client.end();
-        } catch {
-
-        }
-    }
+    return await mainGet('*','inscripciones_estados');
 }
 
 const getUsuarios = async () => {
-    const client = new Client({
-        host: process.env.PGHOST || 'localhost',
-        port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
-        user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || '',
-        database: process.env.PGDATABASE || 'postgres',
-    });
-
-    try {
-        await client.connect();
-        const result = await client.query(`SELECT * FROM public.usuarios`);
-        return result.rows;
-    } catch (err) {
-        console.error('Error consultando PostgreSQL:', err);
-        process.exitCode = 1;
-    } finally {
-        try {
-            await client.end();
-        } catch {
-
-        }
-    }
-}
-
-const softDelCurso = async (id,est,usu) => {
-    const client = new Client({
-        host: process.env.PGHOST || 'localhost',
-        port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
-        user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || '',
-        database: process.env.PGDATABASE || 'postgres',
-    });
-    
-    let now = dateToBase(new Date().toISOString());
-
-    try {
-        await client.connect();
-        await client.query(`UPDATE public.cursos 
-                            SET id_curso_estado = ${est.id_curso_estado}, 
-                            id_usuario_modificacion = ${usu.idUsuario}, 
-                            fecha_hora_modificacion = ${now} 
-                            WHERE id_curso = ${id};`);
-        return true;
-    } catch (err) {
-        console.error('Error consultando PostgreSQL:', err);
-        process.exitCode = 1;
-    } finally {
-        try {
-            await client.end();
-            
-        } catch {
-
-        }
-    }
-}
-
-const softDelEstudiante = async (id,usu) => {
-    const client = new Client({
-        host: process.env.PGHOST || 'localhost',
-        port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
-        user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || '',
-        database: process.env.PGDATABASE || 'postgres',
-    });
-
-    let now = dateToBase(new Date().toISOString());
-    
-    try {
-        await client.connect();
-        await client.query(`UPDATE public.estudiantes SET activo = 0, 
-                            id_usuario_modificacion = ${usu.idUsuario}, 
-                            fecha_hora_modificacion = ${now} 
-                            WHERE id_estudiante = ${id};`);
-        return true;
-    } catch (err) {
-        console.error('Error consultando PostgreSQL:', err);
-        process.exitCode = 1;
-    } finally {
-        try {
-            await client.end();
-            
-        } catch {
-
-        }
-    }
-}
-
-const modificarCurso = async (cur) => {
-    const client = new Client({
-        host: process.env.PGHOST || 'localhost',
-        port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
-        user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || '',
-        database: process.env.PGDATABASE || 'postgres',
-    });
-    
-    let now = dateToBase(cur.fechaHoraModificacion);
-    let ini = dateToBase(cur.fechaInicio);
-
-    try {
-        await client.connect();
-        await client.query(`UPDATE public.cursos 
-                            SET nombre = '${cur.nombre}', 
-                            descripcion = '${cur.descripcion}', 
-                            fecha_inicio = ${ini}, 
-                            cantidad_horas = ${cur.cantidadHoras}, 
-                            inscriptos_max = ${cur.inscriptosMax}, 
-                            id_curso_estado = ${cur.idCursoEstado}, 
-                            id_usuario_modificacion = ${cur.idUsuarioModificacion}, 
-                            fecha_hora_modificacion = ${now} 
-                            WHERE id_curso = ${cur.idCurso};`);
-        return true;
-    } catch (err) {
-        console.error('Error consultando PostgreSQL:', err);
-        process.exitCode = 1;
-    } finally {
-        try {
-            await client.end();
-            
-        } catch {
-
-        }
-    }
-}
-
-const modificarEstudiante = async (est) => {
-    const client = new Client({
-        host: process.env.PGHOST || 'localhost',
-        port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
-        user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || '',
-        database: process.env.PGDATABASE || 'postgres',
-    });
-
-    let now = dateToBase(est.fechaHoraModificacion);
-    let nac = dateToBase(est.fechaNacimiento);
-    
-    try {
-        await client.connect();
-        await client.query(`UPDATE public.estudiantes 
-                            SET documento = '${est.documento}', 
-                            apellido = '${est.apellido}', 
-                            nombres = '${est.nombres}', 
-                            email = '${est.email}', 
-                            fecha_nacimiento = ${nac}, 
-                            activo = 1, 
-                            id_usuario_modificacion = ${est.idUsuarioModificacion}, 
-                            fecha_hora_modificacion = ${now} 
-                            WHERE id_estudiante = ${est.idEstudiante};`);
-        return true;
-    } catch (err) {
-        console.error('Error consultando PostgreSQL:', err);
-        process.exitCode = 1;
-    } finally {
-        try {
-            await client.end();
-            
-        } catch {
-
-        }
-    }
-}
-
-const softDelInscripcion = async (id,usu) => {
-    const client = new Client({
-        host: process.env.PGHOST || 'localhost',
-        port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
-        user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || '',
-        database: process.env.PGDATABASE || 'postgres',
-    });
-
-    let now = dateToBase(new Date().toISOString());
-    
-    try {
-        await client.connect();
-        await client.query(`UPDATE public.inscripciones 
-                            SET id_inscripcion_estado = 2, 
-                            id_usuario_modificacion = ${usu.idUsuario}, 
-                            fecha_hora_modificacion = ${now} 
-                            WHERE id_inscripcion = ${id};`);
-        return true;
-    } catch (err) {
-        console.error('Error consultando PostgreSQL:', err);
-        process.exitCode = 1;
-    } finally {
-        try {
-            await client.end();
-            
-        } catch {
-
-        }
-    }
+    return await mainGet('*','usuarios'); //tengo que poner menos acceso a esto
 }
 
 const agregarCurso = async (obj) => {
-    const client = new Client({
-        host: process.env.PGHOST || 'localhost',
-        port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
-        user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || '',
-        database: process.env.PGDATABASE || 'postgres',
-    });
-
     let now = dateToBase(obj.fechaHoraModificacion);
     let ini = dateToBase(obj.fechaInicio);
+    obj.cantidadHoras = parseInt(obj.cantidadHoras);
+    obj.inscriptosMax = parseInt(obj.inscriptosMax);
 
-    try {
-        await client.connect();
-        let last = await client.query(`SELECT COUNT(*) FROM public.cursos`);
-        let newid = parseInt(last.rows.pop().count) + 1;
-        await client.query(`INSERT INTO public.cursos VALUES
-                            (${newid},'${obj.nombre}', '${obj.descripcion}', ${ini}, 
-                            ${parseInt(obj.cantidadHoras)}, ${parseInt(obj.inscriptosMax)}, 
-                            ${obj.idCursoEstado}, ${obj.idUsuarioModificacion}, ${now})`);
-
-        return true;
-    } catch (err) {
-        console.error('Error consultando PostgreSQL:', err);
-        process.exitCode = 1;
-    } finally {
-        try {
-            await client.end();
-            
-        } catch {
-
-        }
-    }
+    return await mainAdd('cursos',`$1, $2, $3, $4, $5, $6, $7, $8`,
+                                    [obj.nombre,obj.descripcion,ini,obj.cantidadHoras,obj.inscriptosMax,
+                                    obj.idCursoEstado,obj.idUsuarioModificacion,now]);
 }
 
 const agregarEstudiante = async (obj) => {
-    const client = new Client({
-        host: process.env.PGHOST || 'localhost',
-        port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
-        user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || '',
-        database: process.env.PGDATABASE || 'postgres',
-    });
-
     let now = dateToBase(obj.fechaHoraModificacion);
     let nac = dateToBase(obj.fechaNacimiento);
 
-    try {
-        await client.connect();
-        let last = await client.query(`SELECT COUNT(*) FROM public.estudiantes`);
-        let newid = parseInt(last.rows.pop().count) + 6;
-        await client.query(`INSERT INTO public.estudiantes VALUES
-                            (${newid},'${obj.documento}', '${obj.apellido}', '${obj.nombres}', '${obj.email}', 
-                            ${nac}, 1, ${obj.idUsuarioModificacion}, ${now})`);
-
-        return true;
-    } catch (err) {
-        console.error('Error consultando PostgreSQL:', err);
-        process.exitCode = 1;
-    } finally {
-        try {
-            await client.end();
-            
-        } catch {
-
-        }
-    }
+    return await mainAdd('estudiantes',`$1, $2, $3, $4, $5, 1, $6, $7`,
+                                    [obj.documento,obj.apellido,obj.nombres,obj.email,nac,
+                                    obj.idUsuarioModificacion,now]);
 }
 
 const agregarInscripcion = async (obj) => {
-    const client = new Client({
-        host: process.env.PGHOST || 'localhost',
-        port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
-        user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || '',
-        database: process.env.PGDATABASE || 'postgres',
-    });
-
     let now = dateToBase(obj.fechaHoraModificacion);
     let insc = dateToBase(obj.fechaHoraInscripcion);
 
-    try {
-        await client.connect();
-        let last = await client.query(`SELECT COUNT(*) FROM public.inscripciones`);
-        let newid = parseInt(last.rows.pop().count) + 1;
-        await client.query(`INSERT INTO public.inscripciones VALUES
-                            (${newid},${obj.idCurso}, ${obj.idEstudiante}, ${insc}, 
-                            ${obj.idInscripcionEstado}, ${obj.idUsuarioModificacion}, ${now})`);
-
-        return true;
-    } catch (err) {
-        console.error('Error consultando PostgreSQL:', err);
-        process.exitCode = 1;
-    } finally {
-        try {
-            await client.end();
-            
-        } catch {
-
-        }
-    }
+    return await mainAdd('inscripciones',`$1, $2, $3, $4, $5, $6`,
+                                    [obj.idCurso,obj.idEstudiante,insc,obj.idInscripcionEstado,
+                                    obj.idUsuarioModificacion,now]);
 }
 
 function dateToBase(date){
@@ -613,15 +201,12 @@ function dateToBase(date){
     fecha = fecha.split('T')[0];
 
     if (hora){
-        return `'${fecha.split('-')[2]}/${fecha.split('-')[1]}/${fecha.split('-')[0]}T${hora.split(':')[0]}:${hora.split(':')[1]}:${hora.split(':')[2]}'`;
+        return `${fecha.split('-')[2]}/${fecha.split('-')[1]}/${fecha.split('-')[0]}T${hora.split(':')[0]}:${hora.split(':')[1]}:${hora.split(':')[2]}`;
     }
-    return `'${fecha.split('-')[2]}/${fecha.split('-')[1]}/${fecha.split('-')[0]}'`;
+    return `${fecha.split('-')[2]}/${fecha.split('-')[1]}/${fecha.split('-')[0]}`;
 }
 
-export {main, getCursoPage, getLenghtCurso, getCurso,
-        getEstudiantePage, getLenghtEstudiante, getEstudiante,
-        getInscripcionPage, getLenghtInscripcion, getInscripcion,
+export {getLenghtCurso, getLenghtEstudiante, getLenghtInscripcion,
         getCursosEstados, getInscripcionesEstados, getUsuarios,
-        softDelCurso, softDelEstudiante, softDelInscripcion, 
         agregarCurso, agregarEstudiante, agregarInscripcion,
-        modificarCurso, modificarEstudiante};
+        mainGet, mainSet};
