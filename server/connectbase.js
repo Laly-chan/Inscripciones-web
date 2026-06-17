@@ -5,7 +5,7 @@ const mainGet = async (object,base,limit,offset,filter,order) => {
         host: process.env.PGHOST || 'localhost',
         port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
         user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || 'wwssadadqe', //por algún motivo no carga la contraseña del .env
+        password: process.env.PGPASSWORD || '', //por algún motivo no carga la contraseña del .env
         database: process.env.PGDATABASE || '',
     });
 
@@ -53,7 +53,7 @@ const mainSet = async (base,edit,id,info) => {
         host: process.env.PGHOST || 'localhost',
         port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
         user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || 'wwssadadqe',
+        password: process.env.PGPASSWORD || '',
         database: process.env.PGDATABASE || '',
     });
 
@@ -90,7 +90,7 @@ const mainAdd = async (base,info,data) => {
         host: process.env.PGHOST || 'localhost',
         port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
         user: process.env.PGUSER || 'postgres',
-        password: process.env.PGPASSWORD || 'wwssadadqe', //por algún motivo no carga la contraseña del .env
+        password: process.env.PGPASSWORD || '', //por algún motivo no carga la contraseña del .env
         database: process.env.PGDATABASE || '',
     });
 
